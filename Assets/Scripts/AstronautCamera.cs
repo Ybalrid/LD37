@@ -11,6 +11,7 @@ public class AstronautCamera : MonoBehaviour
     private float rotX, rotY;
 
     public float translateForce, rotateForce;
+    public float rotateSpeedRealign;
 
     // Use this for initialization
     private void Start()
@@ -32,61 +33,84 @@ public class AstronautCamera : MonoBehaviour
 
         camTransform.localRotation = camQuat * x * y;
 
+        //Jetpack command code :
+        //TODO : handle fuel depletion
         if (forward())
-        {
             playerBody.AddRelativeForce(0, 0, translateForce);
-        }
-
         if (backward())
-        {
             playerBody.AddRelativeForce(0, 0, -translateForce);
-        }
-
         if (upward())
-        {
             playerBody.AddRelativeForce(0, translateForce, 0);
-        }
-
         if (downward())
-        {
             playerBody.AddRelativeForce(0, -translateForce, 0);
-        }
-
         if (left())
-        {
             playerBody.AddRelativeForce(-translateForce, 0, 0);
-        }
-
         if (right())
-        {
             playerBody.AddRelativeForce(translateForce, 0, 0);
-        }
 
         if (rotatePitchPlus())
-        {
             playerBody.AddRelativeTorque(rotateForce, 0, 0);
-        }
-
         if (rotatePitchMinus())
-        {
             playerBody.AddRelativeTorque(-rotateForce, 0, 0);
-        }
-
         if (rotateYawPlus())
-        {
             playerBody.AddRelativeTorque(0, rotateForce, 0);
-        }
-
         if (rotateYawMinus())
-        {
             playerBody.AddRelativeTorque(0, -rotateForce, 0);
-        }
 
         if (stabilize())
         {
-            // TODO : do this with relative forces and torques
-            playerBody.angularVelocity = Vector3.zero;
-            playerBody.velocity = Vector3.zero;
+            if (playerBody.velocity.x > 0)
+                playerBody.AddRelativeForce(-translateForce, 0, 0);
+            if (playerBody.velocity.x < 0)
+                playerBody.AddRelativeForce(+translateForce, 0, 0);
+            if (playerBody.velocity.y > 0)
+                playerBody.AddRelativeForce(0, -translateForce, 0);
+            if (playerBody.velocity.y < 0)
+                playerBody.AddRelativeForce(0, +translateForce, 0);
+            if (playerBody.velocity.z > 0)
+                playerBody.AddRelativeForce(0, 0, -translateForce);
+            if (playerBody.velocity.z < 0)
+                playerBody.AddRelativeForce(0, 0, +translateForce);
+            /*
+            //Attempt to realign X rot
+
+            if (playerBody.transform.rotation.eulerAngles.x > 0)
+            {
+                if (playerBody.angularVelocity.x < +rotateSpeedRealign)
+                    playerBody.AddRelativeTorque(-rotateForce, 0, 0);
+                else if (playerBody.angularVelocity.x > +rotateSpeedRealign)
+                    playerBody.AddRelativeTorque(+rotateForce, 0, 0);
+            }
+
+            if (playerBody.transform.rotation.eulerAngles.x < 0)
+            {
+                if (playerBody.angularVelocity.x < -rotateSpeedRealign)
+                    playerBody.AddRelativeTorque(+rotateForce, 0, 0);
+                else if (playerBody.angularVelocity.x < -rotateSpeedRealign)
+                    playerBody.AddRelativeTorque(-rotateForce, 0, 0);
+            }
+            */
+
+            //Debug.Log(playerBody.angularVelocity);
+
+            if (playerBody.angularVelocity.x > 0)
+                playerBody.AddRelativeTorque(-rotateForce, 0, 0);
+            if (playerBody.angularVelocity.x < 0)
+                playerBody.AddRelativeTorque(+rotateForce, 0, 0);
+            if (playerBody.angularVelocity.y > 0)
+                playerBody.AddRelativeTorque(0, -rotateForce, 0);
+            if (playerBody.angularVelocity.y < 0)
+                playerBody.AddRelativeTorque(0, +rotateForce, 0);
+
+            if (Mathf.Approximately(0, playerBody.velocity.x))
+                if (Mathf.Approximately(0, playerBody.velocity.y))
+                    if (Mathf.Approximately(0, playerBody.velocity.z))
+                        playerBody.velocity = Vector3.zero;
+
+            if (Mathf.Approximately(0, playerBody.angularVelocity.x / 2))
+                if (Mathf.Approximately(0, playerBody.angularVelocity.y / 2))
+                    if (Mathf.Approximately(0, playerBody.angularVelocity.z / 2))
+                        playerBody.angularVelocity = Vector3.zero;
         }
     }
 
