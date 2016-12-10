@@ -35,17 +35,17 @@ public class AstronautCamera : MonoBehaviour
 
         //Jetpack command code :
         //TODO : handle fuel depletion
-        if (forward())
+        if (forward() && !rotateModifier())
             playerBody.AddRelativeForce(0, 0, translateForce);
-        if (backward())
+        if (backward() && !rotateModifier())
             playerBody.AddRelativeForce(0, 0, -translateForce);
-        if (upward())
+        if (upward() && !rotateModifier())
             playerBody.AddRelativeForce(0, translateForce, 0);
-        if (downward())
+        if (downward() && !rotateModifier())
             playerBody.AddRelativeForce(0, -translateForce, 0);
-        if (left())
+        if (left() && !rotateModifier())
             playerBody.AddRelativeForce(-translateForce, 0, 0);
-        if (right())
+        if (right() && !rotateModifier())
             playerBody.AddRelativeForce(translateForce, 0, 0);
 
         if (rotatePitchPlus())
@@ -72,27 +72,6 @@ public class AstronautCamera : MonoBehaviour
             if (playerBody.velocity.z < 0)
                 playerBody.AddRelativeForce(0, 0, +translateForce);
             /*
-            //Attempt to realign X rot
-
-            if (playerBody.transform.rotation.eulerAngles.x > 0)
-            {
-                if (playerBody.angularVelocity.x < +rotateSpeedRealign)
-                    playerBody.AddRelativeTorque(-rotateForce, 0, 0);
-                else if (playerBody.angularVelocity.x > +rotateSpeedRealign)
-                    playerBody.AddRelativeTorque(+rotateForce, 0, 0);
-            }
-
-            if (playerBody.transform.rotation.eulerAngles.x < 0)
-            {
-                if (playerBody.angularVelocity.x < -rotateSpeedRealign)
-                    playerBody.AddRelativeTorque(+rotateForce, 0, 0);
-                else if (playerBody.angularVelocity.x < -rotateSpeedRealign)
-                    playerBody.AddRelativeTorque(-rotateForce, 0, 0);
-            }
-            */
-
-            //Debug.Log(playerBody.angularVelocity);
-
             if (playerBody.angularVelocity.x > 0)
                 playerBody.AddRelativeTorque(-rotateForce, 0, 0);
             if (playerBody.angularVelocity.x < 0)
@@ -101,17 +80,15 @@ public class AstronautCamera : MonoBehaviour
                 playerBody.AddRelativeTorque(0, -rotateForce, 0);
             if (playerBody.angularVelocity.y < 0)
                 playerBody.AddRelativeTorque(0, +rotateForce, 0);
-
-            if (Mathf.Approximately(0, playerBody.velocity.x))
-                if (Mathf.Approximately(0, playerBody.velocity.y))
-                    if (Mathf.Approximately(0, playerBody.velocity.z))
-                        playerBody.velocity = Vector3.zero;
-
-            if (Mathf.Approximately(0, playerBody.angularVelocity.x / 2))
-                if (Mathf.Approximately(0, playerBody.angularVelocity.y / 2))
-                    if (Mathf.Approximately(0, playerBody.angularVelocity.z / 2))
-                        playerBody.angularVelocity = Vector3.zero;
+                */
+            //cheating by LERPing
+            if (playerBody.angularVelocity != Vector3.zero)
+                playerBody.angularVelocity = Vector3.Lerp(playerBody.angularVelocity, Vector3.zero, 0.1f);
+            else
+                playerBody.rotation = Quaternion.Lerp(playerBody.rotation, Quaternion.identity, 0.01f);
         }
+        Debug.Log("Linear Velocity : " + playerBody.velocity);
+        Debug.Log("Angular velocity : " + playerBody.angularVelocity);
     }
 
     public bool stabilize()
