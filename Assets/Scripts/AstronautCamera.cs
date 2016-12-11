@@ -13,6 +13,8 @@ public class AstronautCamera : MonoBehaviour
     public float translateForce, rotateForce;
     public float rotateSpeedRealign;
 
+    public float axisDigitalThreshold;
+
     // Use this for initialization
     private void Start()
     {
@@ -22,9 +24,26 @@ public class AstronautCamera : MonoBehaviour
         camQuat = camTransform.localRotation;
     }
 
+    private void FixedUpdate()
+    {
+        RaycastHit hit;
+        Ray ray = viewCam.ScreenPointToRay(new Vector3(Screen.height / 2, Screen.width / 2, 0));
+        if (Physics.Raycast(ray, out hit))
+        {
+            Debug.Log(hit.transform.gameObject.name);
+            //hit.transform.GetComponent<Renderer>().sharedMaterial;
+        }
+    }
+
     // Update is called once per frame
     private void Update()
     {
+        Debug.Log("X : " + Input.GetAxis("Horizontal"));
+        Debug.Log("Y : " + Input.GetAxis("Vertical"));
+        Debug.Log("LeftTrig : " + Input.GetAxis("LeftTrig"));
+        Debug.Log("RightTrig : " + Input.GetAxis("RightTrig"));
+        Debug.Log("RightStick X : " + Input.GetAxis("RightStick X"));
+        Debug.Log("RightStick Y : " + Input.GetAxis("RightStick Y"));
         //Camera
         rotX += lookX();
         rotY += lookY();
@@ -59,7 +78,7 @@ public class AstronautCamera : MonoBehaviour
 
         if (stabilize())
         {
-            if (playerBody.velocity.x > 0)
+            /*if (playerBody.velocity.x > 0)
                 playerBody.AddRelativeForce(-translateForce, 0, 0);
             if (playerBody.velocity.x < 0)
                 playerBody.AddRelativeForce(+translateForce, 0, 0);
@@ -70,7 +89,9 @@ public class AstronautCamera : MonoBehaviour
             if (playerBody.velocity.z > 0)
                 playerBody.AddRelativeForce(0, 0, -translateForce);
             if (playerBody.velocity.z < 0)
-                playerBody.AddRelativeForce(0, 0, +translateForce);
+                playerBody.AddRelativeForce(0, 0, +translateForce);*/
+            if (playerBody.velocity != Vector3.zero)
+                playerBody.velocity = Vector3.Lerp(playerBody.velocity, Vector3.zero, 0.1f);
             /*
             if (playerBody.angularVelocity.x > 0)
                 playerBody.AddRelativeTorque(-rotateForce, 0, 0);
@@ -85,14 +106,19 @@ public class AstronautCamera : MonoBehaviour
             if (playerBody.angularVelocity != Vector3.zero)
                 playerBody.angularVelocity = Vector3.Lerp(playerBody.angularVelocity, Vector3.zero, 0.1f);
             else
-                playerBody.rotation = Quaternion.Lerp(playerBody.rotation, Quaternion.identity, 0.01f);
+            {
+                if (rotateModifier())
+                    playerBody.rotation = Quaternion.Lerp(playerBody.rotation, Quaternion.identity, 0.01f);
+            }
         }
-        Debug.Log("Linear Velocity : " + playerBody.velocity);
-        Debug.Log("Angular velocity : " + playerBody.angularVelocity);
+        //Debug.Log("Linear Velocity : " + playerBody.velocity);
+        //Debug.Log("Angular velocity : " + playerBody.angularVelocity);
     }
 
     public bool stabilize()
     {
+        if (Input.GetKey(KeyCode.Joystick1Button4))
+            return true;
         if (Input.GetKey(KeyCode.Space))
             return true;
         return false;
@@ -101,6 +127,8 @@ public class AstronautCamera : MonoBehaviour
     //W or Z or GamePad ???
     private bool forward()
     {
+        if (Input.GetAxis("Vertical") < -axisDigitalThreshold)
+            return true;
         //Put commands to go forward there
         if (Input.GetKey(KeyCode.W))
             return true;
@@ -112,6 +140,8 @@ public class AstronautCamera : MonoBehaviour
 
     private bool backward()
     {
+        if (Input.GetAxis("Vertical") > axisDigitalThreshold)
+            return true;
         if (Input.GetKey(KeyCode.S))
             return true;
         //put commands to go backward there
@@ -120,6 +150,8 @@ public class AstronautCamera : MonoBehaviour
 
     private bool upward()
     {
+        if (Input.GetAxis("RightTrig") > axisDigitalThreshold)
+            return true;
         if (Input.GetKey(KeyCode.R))
             return true;
         return false;
@@ -127,6 +159,8 @@ public class AstronautCamera : MonoBehaviour
 
     private bool downward()
     {
+        if (Input.GetAxis("LeftTrig") > axisDigitalThreshold)
+            return true;
         if (Input.GetKey(KeyCode.F))
             return true;
         return false;
@@ -134,6 +168,8 @@ public class AstronautCamera : MonoBehaviour
 
     private bool left()
     {
+        if (Input.GetAxis("Horizontal") < -axisDigitalThreshold)
+            return true;
         if (Input.GetKey(KeyCode.A))
             return true;
         if (Input.GetKey(KeyCode.Q))
@@ -143,6 +179,8 @@ public class AstronautCamera : MonoBehaviour
 
     private bool right()
     {
+        if (Input.GetAxis("Horizontal") > axisDigitalThreshold)
+            return true;
         if (Input.GetKey(KeyCode.D))
             return true;
         return false;
@@ -170,6 +208,8 @@ public class AstronautCamera : MonoBehaviour
 
     private bool rotateModifier()
     {
+        if (Input.GetKey(KeyCode.Joystick1Button3))
+            return true;
         if (Input.GetKey(KeyCode.LeftShift))
             return true;
         return false;
@@ -177,6 +217,8 @@ public class AstronautCamera : MonoBehaviour
 
     private float lookX()
     {
+        if (Input.GetAxis("RightStick X") != 0)
+            return Input.GetAxis("RightStick X");
         if (Input.GetAxis("Mouse X") != 0)
             return Input.GetAxis("Mouse X");
         return 0;
@@ -184,6 +226,8 @@ public class AstronautCamera : MonoBehaviour
 
     private float lookY()
     {
+        if (Input.GetAxis("RightStick Y") != 0)
+            return Input.GetAxis("RightStick Y");
         if (Input.GetAxis("Mouse Y") != 0)
             return Input.GetAxis("Mouse Y");
         return 0;
