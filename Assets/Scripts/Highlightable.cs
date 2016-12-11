@@ -9,6 +9,9 @@ public class Highlightable : MonoBehaviour
 
     private Renderer myRenderer;
 
+    public bool isTool;
+    public string name;
+
     // Use this for initialization
     private void Start()
     {
