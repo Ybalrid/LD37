@@ -27,23 +27,31 @@ public class AstronautCamera : MonoBehaviour
     private void FixedUpdate()
     {
         RaycastHit hit;
-        Ray ray = viewCam.ScreenPointToRay(new Vector3(Screen.height / 2, Screen.width / 2, 0));
-        if (Physics.Raycast(ray, out hit))
+        Ray ray = new Ray(viewCam.transform.position, viewCam.transform.forward);
+        if (Physics.Raycast(ray, out hit, 1000.0f))
         {
             Debug.Log(hit.transform.gameObject.name);
-            //hit.transform.GetComponent<Renderer>().sharedMaterial;
+            Highlightable highlatable = hit.transform.GetComponent<Highlightable>();
+            if (highlatable != null)
+            {
+                highlatable.highlighted = true;
+
+                //Test if user want to grab object
+
+                //Grab object
+            }
         }
     }
 
     // Update is called once per frame
     private void Update()
     {
-        Debug.Log("X : " + Input.GetAxis("Horizontal"));
-        Debug.Log("Y : " + Input.GetAxis("Vertical"));
-        Debug.Log("LeftTrig : " + Input.GetAxis("LeftTrig"));
-        Debug.Log("RightTrig : " + Input.GetAxis("RightTrig"));
-        Debug.Log("RightStick X : " + Input.GetAxis("RightStick X"));
-        Debug.Log("RightStick Y : " + Input.GetAxis("RightStick Y"));
+        //Debug.Log("X : " + Input.GetAxis("Horizontal"));
+        //Debug.Log("Y : " + Input.GetAxis("Vertical"));
+        //Debug.Log("LeftTrig : " + Input.GetAxis("LeftTrig"));
+        //Debug.Log("RightTrig : " + Input.GetAxis("RightTrig"));
+        //Debug.Log("RightStick X : " + Input.GetAxis("RightStick X"));
+        //Debug.Log("RightStick Y : " + Input.GetAxis("RightStick Y"));
         //Camera
         rotX += lookX();
         rotY += lookY();
@@ -75,33 +83,16 @@ public class AstronautCamera : MonoBehaviour
             playerBody.AddRelativeTorque(0, rotateForce, 0);
         if (rotateYawMinus())
             playerBody.AddRelativeTorque(0, -rotateForce, 0);
+        if (rotateRollPlus())
+            playerBody.AddRelativeTorque(0, 0, rotateForce);
+        if (rotateRollMinus())
+            playerBody.AddRelativeTorque(0, 0, -rotateForce);
 
         if (stabilize())
         {
-            /*if (playerBody.velocity.x > 0)
-                playerBody.AddRelativeForce(-translateForce, 0, 0);
-            if (playerBody.velocity.x < 0)
-                playerBody.AddRelativeForce(+translateForce, 0, 0);
-            if (playerBody.velocity.y > 0)
-                playerBody.AddRelativeForce(0, -translateForce, 0);
-            if (playerBody.velocity.y < 0)
-                playerBody.AddRelativeForce(0, +translateForce, 0);
-            if (playerBody.velocity.z > 0)
-                playerBody.AddRelativeForce(0, 0, -translateForce);
-            if (playerBody.velocity.z < 0)
-                playerBody.AddRelativeForce(0, 0, +translateForce);*/
             if (playerBody.velocity != Vector3.zero)
                 playerBody.velocity = Vector3.Lerp(playerBody.velocity, Vector3.zero, 0.1f);
-            /*
-            if (playerBody.angularVelocity.x > 0)
-                playerBody.AddRelativeTorque(-rotateForce, 0, 0);
-            if (playerBody.angularVelocity.x < 0)
-                playerBody.AddRelativeTorque(+rotateForce, 0, 0);
-            if (playerBody.angularVelocity.y > 0)
-                playerBody.AddRelativeTorque(0, -rotateForce, 0);
-            if (playerBody.angularVelocity.y < 0)
-                playerBody.AddRelativeTorque(0, +rotateForce, 0);
-                */
+
             //cheating by LERPing
             if (playerBody.angularVelocity != Vector3.zero)
                 playerBody.angularVelocity = Vector3.Lerp(playerBody.angularVelocity, Vector3.zero, 0.1f);
@@ -204,6 +195,16 @@ public class AstronautCamera : MonoBehaviour
     private bool rotatePitchMinus()
     {
         return rotateModifier() && backward();
+    }
+
+    private bool rotateRollPlus()
+    {
+        return rotateModifier() && downward();
+    }
+
+    private bool rotateRollMinus()
+    {
+        return rotateModifier() && upward();
     }
 
     private bool rotateModifier()
