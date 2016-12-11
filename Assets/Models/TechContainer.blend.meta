@@ -1,52 +1,29 @@
 fileFormatVersion: 2
-guid: c1e83ed07259eb34189c3616b0bfc485
-timeCreated: 1481417331
+guid: a5d43f26b0395ce4c90e7bb0191cef81
+timeCreated: 1481485623
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
     100002: Cube
-    100004: Cube_001
-    100006: ControllConsole
-    100008: Seat
-    100010: Yoke
-    100012: Plane
-    100014: Hull0
-    100016: MainScreen
+    100004: TechContainer
+    100006: Pannel
     400000: //RootNode
     400002: Cube
-    400004: Cube_001
-    400006: ControllConsole
-    400008: Seat
-    400010: Yoke
-    400012: Plane
-    400014: Hull0
-    400016: MainScreen
-    2300000: Cube
-    2300002: Cube_001
-    2300004: ControllConsole
-    2300006: Seat
-    2300008: Yoke
-    2300010: Plane
-    2300012: Hull0
-    2300014: MainScreen
-    3300000: Cube
-    3300002: Cube_001
-    3300004: ControllConsole
-    3300006: Seat
-    3300008: Yoke
-    3300010: Plane
-    3300012: Hull0
-    3300014: MainScreen
-    4300000: Cube_001
+    400004: TechContainer
+    400006: Pannel
+    2300000: //RootNode
+    2300002: Cube
+    2300004: TechContainer
+    2300006: Pannel
+    3300000: //RootNode
+    3300002: Cube
+    3300004: TechContainer
+    3300006: Pannel
+    4300000: TechContainer
     4300002: Cube
-    4300004: ControllConsole
-    4300006: Seat
-    4300008: Yoke
-    4300010: Plane
-    4300012: Hull0
-    4300014: MainScreen
+    4300004: Pannel
     7400000: Default Take
     9500000: //RootNode
   materials:

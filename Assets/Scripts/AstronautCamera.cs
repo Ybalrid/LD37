@@ -7,13 +7,12 @@ public class AstronautCamera : MonoBehaviour
     private Camera viewCam;
     private Quaternion camQuat;
     private Transform camTransform;
-
     private float rotX, rotY;
-
     public float translateForce, rotateForce;
     public float rotateSpeedRealign;
-
     public float axisDigitalThreshold;
+    private GameObject grabbed;
+    private Quaternion startOrientation;
 
     // Use this for initialization
     private void Start()
@@ -22,36 +21,58 @@ public class AstronautCamera : MonoBehaviour
         viewCam = GetComponentInChildren<Camera>();
         camTransform = viewCam.GetComponent<Transform>();
         camQuat = camTransform.localRotation;
+        startOrientation = playerBody.rotation;
     }
 
     private void FixedUpdate()
     {
         RaycastHit hit;
         Ray ray = new Ray(viewCam.transform.position, viewCam.transform.forward);
-        if (Physics.Raycast(ray, out hit, 1000.0f))
+        if (Physics.Raycast(ray, out hit, 10.0f))
         {
             Debug.Log(hit.transform.gameObject.name);
             Highlightable highlatable = hit.transform.GetComponent<Highlightable>();
             if (highlatable != null)
             {
-                highlatable.highlighted = true;
+                if (hit.transform.gameObject != grabbed)
+                    highlatable.highlighted = true;
 
                 //Test if user want to grab object
+                if (interact())
+                {
+                    ungrab();
 
-                //Grab object
+                    //Grab object
+                    if (hit.transform.GetComponent<ObjectMoverTest>())
+                        hit.transform.GetComponent<ObjectMoverTest>().attached = true;
+                    hit.transform.SetParent(transform.GetChild(0));
+                    hit.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                    hit.transform.localPosition = Vector3.zero;
+                    hit.transform.localRotation = Quaternion.Inverse(Quaternion.identity);
+                    grabbed = hit.transform.gameObject;
+                }
             }
+        }
+    }
+
+    private void ungrab()
+    {
+        if (grabbed)
+        {
+            if (grabbed.GetComponent<ObjectMoverTest>())
+                grabbed.GetComponent<ObjectMoverTest>().attached = false;
+            grabbed.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+            grabbed.transform.SetParent(null);
+            grabbed = null;
         }
     }
 
     // Update is called once per frame
     private void Update()
     {
-        //Debug.Log("X : " + Input.GetAxis("Horizontal"));
-        //Debug.Log("Y : " + Input.GetAxis("Vertical"));
-        //Debug.Log("LeftTrig : " + Input.GetAxis("LeftTrig"));
-        //Debug.Log("RightTrig : " + Input.GetAxis("RightTrig"));
-        //Debug.Log("RightStick X : " + Input.GetAxis("RightStick X"));
-        //Debug.Log("RightStick Y : " + Input.GetAxis("RightStick Y"));
+        if (grabbed)
+            grabbed.transform.rotation = transform.rotation;
+
         //Camera
         rotX += lookX();
         rotY += lookY();
@@ -59,6 +80,9 @@ public class AstronautCamera : MonoBehaviour
         Quaternion y = Quaternion.AngleAxis(rotY, Vector3.left);
 
         camTransform.localRotation = camQuat * x * y;
+
+        if (interactSecondary())
+            ungrab();
 
         //Jetpack command code :
         //TODO : handle fuel depletion
@@ -99,11 +123,9 @@ public class AstronautCamera : MonoBehaviour
             else
             {
                 if (rotateModifier())
-                    playerBody.rotation = Quaternion.Lerp(playerBody.rotation, Quaternion.identity, 0.01f);
+                    playerBody.rotation = Quaternion.Lerp(playerBody.rotation, startOrientation, 0.01f);
             }
         }
-        //Debug.Log("Linear Velocity : " + playerBody.velocity);
-        //Debug.Log("Angular velocity : " + playerBody.angularVelocity);
     }
 
     public bool stabilize()
@@ -212,6 +234,24 @@ public class AstronautCamera : MonoBehaviour
         if (Input.GetKey(KeyCode.Joystick1Button3))
             return true;
         if (Input.GetKey(KeyCode.LeftShift))
+            return true;
+        return false;
+    }
+
+    private bool interactSecondary()
+    {
+        if (Input.GetKey(KeyCode.Joystick1Button1))
+            return true;
+        if (Input.GetKey(KeyCode.Mouse1))
+            return true;
+        return false;
+    }
+
+    private bool interact()
+    {
+        if (Input.GetKey(KeyCode.Joystick1Button0))
+            return true;
+        if (Input.GetKey(KeyCode.Mouse0))
             return true;
         return false;
     }
