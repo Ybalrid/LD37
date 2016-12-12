@@ -26,6 +26,8 @@ public class AstronautCamera : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (Input.GetKey(KeyCode.Joystick1Button7) || Input.GetKey(KeyCode.Escape))
+            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         RaycastHit hit;
         Ray ray = new Ray(viewCam.transform.position, viewCam.transform.forward);
         if (Physics.Raycast(ray, out hit, 1.5f))
