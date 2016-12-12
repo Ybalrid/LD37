@@ -12,8 +12,10 @@ public class ContainerOpenner : Interactive
 
     public override void doStuff(string grabbedName)
     {
+        Debug.Log("doStuff called on pannel with " + grabbedName);
         if (container.GetComponent<OpenablePannel>())
         {
+            Debug.Log("We have an OpenablePannel object");
             if (grabbedName == "Screwdriver")
             {
                 container.GetComponent<OpenablePannel>().open = true;

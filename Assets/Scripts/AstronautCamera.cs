@@ -30,7 +30,6 @@ public class AstronautCamera : MonoBehaviour
         Ray ray = new Ray(viewCam.transform.position, viewCam.transform.forward);
         if (Physics.Raycast(ray, out hit, 1.5f))
         {
-            Debug.Log(hit.transform.gameObject.name);
             Highlightable highlatable = hit.transform.GetComponent<Highlightable>();
             if (highlatable != null)
             {
