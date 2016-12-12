@@ -36,20 +36,33 @@ public class AstronautCamera : MonoBehaviour
             {
                 if (hit.transform.gameObject != grabbed)
                     highlatable.highlighted = true;
-
-                //Test if user want to grab object
-                if (interact())
+                if (hit.transform.GetComponent<Interactive>())
                 {
-                    ungrab();
+                    string gname;
+                    if (grabbed) gname = grabbed.name;
+                    else gname = "nothing";
+                    if (interact())
+                        hit.transform.GetComponent<Interactive>().doStuff(gname);
+                }
+                else
+                {
+                    if (hit.transform.gameObject != grabbed)
+                        highlatable.highlighted = true;
 
-                    //Grab object
-                    if (hit.transform.GetComponent<ObjectMoverTest>())
-                        hit.transform.GetComponent<ObjectMoverTest>().attached = true;
-                    hit.transform.SetParent(transform.GetChild(0));
-                    hit.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-                    hit.transform.localPosition = Vector3.zero;
-                    hit.transform.localRotation = Quaternion.Inverse(Quaternion.identity);
-                    grabbed = hit.transform.gameObject;
+                    //Test if user want to grab object
+                    if (interact())
+                    {
+                        ungrab();
+
+                        //Grab object
+                        if (hit.transform.GetComponent<ObjectMoverTest>())
+                            hit.transform.GetComponent<ObjectMoverTest>().attached = true;
+                        hit.transform.SetParent(transform.GetChild(0));
+                        hit.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                        hit.transform.localPosition = Vector3.zero;
+                        hit.transform.localRotation = Quaternion.Inverse(Quaternion.identity);
+                        grabbed = hit.transform.gameObject;
+                    }
                 }
             }
         }

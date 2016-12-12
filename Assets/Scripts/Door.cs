@@ -25,4 +25,14 @@ public class Door : MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, startPosition, 0.1f);
         }
     }
+
+    public void openDoor()
+    {
+        open = true;
+    }
+
+    public void closeDoor()
+    {
+        open = false;
+    }
 }
