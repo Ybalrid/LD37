@@ -33,8 +33,6 @@ public class OpenablePannel : MonoBehaviour
             qref = Quaternion.Inverse(pannel.transform.rotation);
         else
             qref = Quaternion.identity;
-        //qref = Quaternion.identity;
-        Debug.Log(qref.eulerAngles);
         if (open)
         {
             pannel.transform.position = Vector3.Lerp(pannel.transform.position, pannelPos + qref * pannelTranslate, interpolationFactor);

@@ -17,7 +17,6 @@ public class ButtonDoor : Interactive
 
     public override void doStuff(string gname)
     {
-        Debug.Log("Button \"doStuff called\"");
         if (linkedDoor.GetComponent<Door>())
             linkedDoor.GetComponent<Door>().openDoor();
     }
